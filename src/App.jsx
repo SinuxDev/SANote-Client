@@ -1,9 +1,38 @@
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+import Main from "./layouts/Main";
+
+import Index from "./pages/index";
+import Create from "./pages/Create";
+import Edit from "./pages/Edit";
+import Details from "./pages/Details";
+
 const App = () => {
-  return (
-    <div>
-      <h1 className="text-red-600">Hello vite</h1>
-    </div>
-  );
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <Main />,
+      children: [
+        {
+          index: true,
+          element: <Index />,
+        },
+        {
+          path: "/create",
+          element: <Create />,
+        },
+        {
+          path: "/edit/:id",
+          element: <Edit />,
+        },
+        {
+          path: "/notes/:id",
+          element: <Details />,
+        },
+      ],
+    },
+  ]);
+  return <RouterProvider router={router} />;
 };
 
 export default App;
