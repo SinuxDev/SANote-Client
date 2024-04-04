@@ -2,6 +2,7 @@ import { ArrowLeftEndOnRectangleIcon } from "@heroicons/react/24/solid";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { Formik, Field, Form } from "formik";
+import * as Yup from "yup";
 
 //formik custom error message
 import CustomStyleErrorMessage from "./CustomStyleErrorMessage";
@@ -12,20 +13,31 @@ const NoteForm = ({ isCreate }) => {
     content: "",
   };
 
+  //Yup validation
+  const NoteFormSchema = Yup.object({
+    title: Yup.string()
+      .min(10, "Title is too short!")
+      .max(30, "Title is too long!")
+      .required("Title is required!"),
+    content: Yup.string()
+      .min(5, "Content must be at least 5 characters")
+      .required("Content is required!"),
+  });
+
   //This method has initial values
-  const validate = (values) => {
-    const errors = {};
+  // const validate = (values) => {
+  //   const errors = {};
 
-    if (values.title.trim().length < 10) {
-      errors.title = "Title must be at least 10 characters";
-    }
+  //   if (values.title.trim().length < 10) {
+  //     errors.title = "Title must be at least 10 characters";
+  //   }
 
-    if (values.content.trim().length < 10) {
-      errors.content = "Content must be at least 10 characters";
-    }
+  //   if (values.content.trim().length < 10) {
+  //     errors.content = "Content must be at least 10 characters";
+  //   }
 
-    return errors;
-  };
+  //   return errors;
+  // };
 
   // In this method (values) is the form input box
   const submitHandler = (values) => {
@@ -45,10 +57,10 @@ const NoteForm = ({ isCreate }) => {
 
       <Formik
         initialValues={initialValues}
-        validate={validate}
+        validationSchema={NoteFormSchema}
         onSubmit={submitHandler}
       >
-        {({ errors, touched }) => (
+        {() => (
           <Form>
             <div className="mb-3">
               <label htmlFor="title" className=" font-medium block">
