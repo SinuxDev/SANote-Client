@@ -16,7 +16,7 @@ const NoteForm = ({ isCreate }) => {
   //Yup validation
   const NoteFormSchema = Yup.object({
     title: Yup.string()
-      .min(10, "Title is too short!")
+      .min(3, "Title is too short!")
       .max(30, "Title is too long!")
       .required("Title is required!"),
     content: Yup.string()
