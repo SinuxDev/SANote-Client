@@ -11,17 +11,16 @@ const Details = () => {
   const [note, setNote] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const getNote = async () => {
-    setLoading(true);
-    const response = await fetch(`${import.meta.env.VITE_API}/notes/${id}`);
-    const note = await response.json();
-    setNote(note);
-    setLoading(false);
-  };
-
   useEffect(() => {
+    const getNote = async () => {
+      setLoading(true);
+      const response = await fetch(`${import.meta.env.VITE_API}/notes/${id}`);
+      const note = await response.json();
+      setNote(note);
+      setLoading(false);
+    };
     getNote();
-  }, []);
+  }, [id]);
 
   return (
     <>
