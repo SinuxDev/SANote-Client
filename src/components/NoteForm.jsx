@@ -34,15 +34,20 @@ const NoteForm = ({ isCreate }) => {
   }, [isCreate, getOldNote]);
 
   useEffect(() => {
-    if (oldNote) {
-      setInitivalValues(oldNote);
+    if (oldNote && !isCreate) {
+      setInitivalValues({
+        title: oldNote.title,
+        content: oldNote.content,
+        note_id: oldNote._id,
+      });
     } else {
       setInitivalValues({
         title: "",
         content: "",
+        note_id: "",
       });
     }
-  }, [oldNote]);
+  }, [oldNote, isCreate]);
 
   //Yup validation
   const NoteFormSchema = Yup.object({
@@ -57,29 +62,35 @@ const NoteForm = ({ isCreate }) => {
 
   // In this method (values) is the form input box
   const submitHandler = async (values) => {
+    let API = `${import.meta.env.VITE_API}`;
+
     if (isCreate) {
-      const response = await fetch(`${import.meta.env.VITE_API}/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
+      API = `${import.meta.env.VITE_API}/create`;
+    } else {
+      API = `${import.meta.env.VITE_API}/edit-note/${values.note_id}`;
+    }
+
+    const response = await fetch(API, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(values),
+    });
+    if (response.status === 201 || response.status == 200) {
+      setRedirect(true);
+    } else {
+      toast.error("Something went wrong", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Bounce,
       });
-      if (response.status === 201) {
-        setRedirect(true);
-      } else {
-        toast.error("Something went wrong", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Bounce,
-        });
-      }
     }
   };
 
@@ -145,6 +156,7 @@ const NoteForm = ({ isCreate }) => {
               />
               <CustomStyleErrorMessage name="content" />
             </div>
+            <Field type="text" name="note_id" id="note_id" hidden />
             <button
               type="submit"
               className="text-white bg-teal-600 py-3 font-medium w-full"
