@@ -1,13 +1,16 @@
 import { ArrowLeftEndOnRectangleIcon } from "@heroicons/react/24/solid";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
 
 //formik custom error message
 import CustomStyleErrorMessage from "./CustomStyleErrorMessage";
+import { useState } from "react";
 
 const NoteForm = ({ isCreate }) => {
+  const [redirect, setRedirect] = useState(false);
+
   const initialValues = {
     title: "",
     content: "",
@@ -24,25 +27,27 @@ const NoteForm = ({ isCreate }) => {
       .required("Content is required!"),
   });
 
-  //This method has initial values
-  // const validate = (values) => {
-  //   const errors = {};
-
-  //   if (values.title.trim().length < 10) {
-  //     errors.title = "Title must be at least 10 characters";
-  //   }
-
-  //   if (values.content.trim().length < 10) {
-  //     errors.content = "Content must be at least 10 characters";
-  //   }
-
-  //   return errors;
-  // };
-
   // In this method (values) is the form input box
-  const submitHandler = (values) => {
-    console.log(values);
+  const submitHandler = async (values) => {
+    if (isCreate) {
+      const response = await fetch(`${import.meta.env.VITE_API}/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+      if (response.status === 201) {
+        setRedirect(true);
+      } else {
+        //
+      }
+    }
   };
+
+  if (redirect) {
+    return <Navigate to={"/"} />;
+  }
 
   return (
     <section>
