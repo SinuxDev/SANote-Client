@@ -7,6 +7,8 @@ import * as Yup from "yup";
 //formik custom error message
 import CustomStyleErrorMessage from "./CustomStyleErrorMessage";
 import { useState } from "react";
+import { ToastContainer, toast, Bounce } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const NoteForm = ({ isCreate }) => {
   const [redirect, setRedirect] = useState(false);
@@ -40,7 +42,17 @@ const NoteForm = ({ isCreate }) => {
       if (response.status === 201) {
         setRedirect(true);
       } else {
-        //
+        toast.error("Something went wrong", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Bounce,
+        });
       }
     }
   };
@@ -51,6 +63,19 @@ const NoteForm = ({ isCreate }) => {
 
   return (
     <section>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        transition={Bounce}
+      />
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold mb-5">
           {isCreate ? "Create a new note" : "Edit your note"}
