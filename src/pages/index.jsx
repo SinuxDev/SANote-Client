@@ -24,7 +24,11 @@ const Index = () => {
       {!loading && notes.length > 0 ? (
         <>
           {notes.map((note) => (
-            <Note key={note._id} note={note} />
+            <Note
+              key={note._id}
+              note={note}
+              getNotesFromAPI={getNotesFromAPI}
+            />
           ))}
         </>
       ) : (
