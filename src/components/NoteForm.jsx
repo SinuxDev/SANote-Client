@@ -1,22 +1,48 @@
 import { ArrowLeftEndOnRectangleIcon } from "@heroicons/react/24/solid";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
 
 //formik custom error message
 import CustomStyleErrorMessage from "./CustomStyleErrorMessage";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const NoteForm = ({ isCreate }) => {
   const [redirect, setRedirect] = useState(false);
+  const [oldNote, setOldNote] = useState({});
+  const [initialValues, setInitivalValues] = useState({});
 
-  const initialValues = {
-    title: "",
-    content: "",
-  };
+  const { id } = useParams();
+
+  const getOldNote = useCallback(async () => {
+    const response = await fetch(`${import.meta.env.VITE_API}/edit/${id}`);
+    if (response.status === 200) {
+      const data = await response.json();
+      setOldNote(data);
+    } else {
+      setRedirect(true);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (!isCreate) {
+      getOldNote();
+    }
+  }, [isCreate, getOldNote]);
+
+  useEffect(() => {
+    if (oldNote) {
+      setInitivalValues(oldNote);
+    } else {
+      setInitivalValues({
+        title: "",
+        content: "",
+      });
+    }
+  }, [oldNote]);
 
   //Yup validation
   const NoteFormSchema = Yup.object({
@@ -89,6 +115,7 @@ const NoteForm = ({ isCreate }) => {
         initialValues={initialValues}
         validationSchema={NoteFormSchema}
         onSubmit={submitHandler}
+        enableReinitialize={true}
       >
         {() => (
           <Form>
@@ -122,7 +149,7 @@ const NoteForm = ({ isCreate }) => {
               type="submit"
               className="text-white bg-teal-600 py-3 font-medium w-full"
             >
-              Save Note
+              {isCreate ? "Save Note" : "Update Note"}
             </button>
           </Form>
         )}
