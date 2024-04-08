@@ -1,4 +1,7 @@
-import { ArrowLeftEndOnRectangleIcon } from "@heroicons/react/24/solid";
+import {
+  ArrowLeftEndOnRectangleIcon,
+  ArrowUpTrayIcon,
+} from "@heroicons/react/24/solid";
 import { Link, Navigate, useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import { Formik, Field, Form } from "formik";
@@ -6,7 +9,7 @@ import * as Yup from "yup";
 
 //formik custom error message
 import CustomStyleErrorMessage from "./CustomStyleErrorMessage";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -14,6 +17,8 @@ const NoteForm = ({ isCreate }) => {
   const [redirect, setRedirect] = useState(false);
   const [oldNote, setOldNote] = useState({});
   const [initialValues, setInitivalValues] = useState({});
+  const [previewImg, setPreviewImg] = useState(null);
+  const fileRef = useRef();
 
   const { id } = useParams();
 
@@ -39,12 +44,14 @@ const NoteForm = ({ isCreate }) => {
         title: oldNote.title,
         content: oldNote.content,
         note_id: oldNote._id,
+        cover_image: oldNote.cover_image,
       });
     } else {
       setInitivalValues({
         title: "",
         content: "",
         note_id: "",
+        cover_image: null,
       });
     }
   }, [oldNote, isCreate]);
@@ -59,6 +66,21 @@ const NoteForm = ({ isCreate }) => {
       .min(5, "Content must be at least 5 characters")
       .required("Content is required!"),
   });
+
+  //Method to display preview image
+  const handleImageChange = (event, setFieldValue) => {
+    const selectedImage = event.target.files[0];
+    if (selectedImage) {
+      setPreviewImg(URL.createObjectURL(selectedImage));
+      setFieldValue("cover_image", selectedImage);
+    }
+  };
+
+  //Method to clear preview image
+  const clearPreviewImg = (setFieldValue) => {
+    setPreviewImg(null);
+    setFieldValue("cover_image", null);
+  };
 
   // In this method (values) is the form input box
   const submitHandler = async (values) => {
@@ -128,7 +150,7 @@ const NoteForm = ({ isCreate }) => {
         onSubmit={submitHandler}
         enableReinitialize={true}
       >
-        {() => (
+        {({ values, setFieldValue }) => (
           <Form>
             <div className="mb-3">
               <label htmlFor="title" className=" font-medium block">
@@ -142,7 +164,8 @@ const NoteForm = ({ isCreate }) => {
               />
               <CustomStyleErrorMessage name="title" />
             </div>
-            <div className="">
+
+            <div className="mb-3">
               <label htmlFor="content" className=" font-medium block">
                 Note content
               </label>
@@ -157,6 +180,46 @@ const NoteForm = ({ isCreate }) => {
               <CustomStyleErrorMessage name="content" />
             </div>
             <Field type="text" name="note_id" id="note_id" hidden />
+            <div className="mb-3">
+              <div className="flex items-center justify-between">
+                <label htmlFor="cover_image" className=" font-medium block">
+                  Cover Image
+                  <span className="text-xs font-medium">optional</span>
+                </label>
+                {previewImg && (
+                  <p
+                    className="text-base font-medium text-teal-600 cursor-pointer"
+                    onClick={() => clearPreviewImg(setFieldValue)}
+                  >
+                    clear
+                  </p>
+                )}
+              </div>
+              <input
+                type="file"
+                name="cover_image"
+                hidden
+                ref={fileRef}
+                onChange={(e) => {
+                  handleImageChange(e, setFieldValue);
+                }}
+              />
+              <div
+                className="border border-teal-600 flex items-center justify-center text-teal-950 border-dashed h-60 cursor-pointer rounded-lg relative overflow-hidden"
+                onClick={() => {
+                  fileRef.current.click();
+                }}
+              >
+                <ArrowUpTrayIcon width={30} height={30} className="z-20" />
+                {previewImg && (
+                  <img
+                    src={previewImg}
+                    alt={"preview"}
+                    className="w-full absolute top-0 left-0 h-full object-cover opactiy-80 z-10"
+                  />
+                )}
+              </div>
+            </div>
             <button
               type="submit"
               className="text-white bg-teal-600 py-3 font-medium w-full"
