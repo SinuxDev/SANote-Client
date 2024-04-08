@@ -56,6 +56,9 @@ const NoteForm = ({ isCreate }) => {
     }
   }, [oldNote, isCreate]);
 
+  //Validation for upload image
+  const SUPPORTED_FORMAT = ["image/jpg", "image/jpeg", "image/png"];
+
   //Yup validation
   const NoteFormSchema = Yup.object({
     title: Yup.string()
@@ -65,6 +68,11 @@ const NoteForm = ({ isCreate }) => {
     content: Yup.string()
       .min(5, "Content must be at least 5 characters")
       .required("Content is required!"),
+    cover_image: Yup.mixed()
+      .nullable()
+      .test("FILE_FORMAT", "Invalid file format", (value) => {
+        return !value || SUPPORTED_FORMAT.includes(value.type);
+      }),
   });
 
   //Method to display preview image
@@ -92,12 +100,15 @@ const NoteForm = ({ isCreate }) => {
       API = `${import.meta.env.VITE_API}/edit-note/${values.note_id}`;
     }
 
+    const formData = new FormData();
+    formData.append("title", values.title);
+    formData.append("content", values.content);
+    formData.append("cover_image", values.cover_image);
+    formData.append("note_id", values.note_id);
+
     const response = await fetch(API, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(values),
+      body: formData,
     });
     if (response.status === 201 || response.status == 200) {
       setRedirect(true);
@@ -151,7 +162,7 @@ const NoteForm = ({ isCreate }) => {
         enableReinitialize={true}
       >
         {({ values, setFieldValue }) => (
-          <Form>
+          <Form encType="multipart/form-data">
             <div className="mb-3">
               <label htmlFor="title" className=" font-medium block">
                 Note Title
@@ -179,7 +190,6 @@ const NoteForm = ({ isCreate }) => {
               />
               <CustomStyleErrorMessage name="content" />
             </div>
-            <Field type="text" name="note_id" id="note_id" hidden />
             <div className="mb-3">
               <div className="flex items-center justify-between">
                 <label htmlFor="cover_image" className=" font-medium block">
@@ -219,6 +229,7 @@ const NoteForm = ({ isCreate }) => {
                   />
                 )}
               </div>
+              <CustomStyleErrorMessage name="cover_image" />
             </div>
             <button
               type="submit"
