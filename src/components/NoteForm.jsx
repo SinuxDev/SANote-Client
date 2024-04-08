@@ -161,7 +161,7 @@ const NoteForm = ({ isCreate }) => {
         onSubmit={submitHandler}
         enableReinitialize={true}
       >
-        {({ values, setFieldValue }) => (
+        {({ setFieldValue }) => (
           <Form encType="multipart/form-data">
             <div className="mb-3">
               <label htmlFor="title" className=" font-medium block">
