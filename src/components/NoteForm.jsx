@@ -221,12 +221,32 @@ const NoteForm = ({ isCreate }) => {
                 }}
               >
                 <ArrowUpTrayIcon width={30} height={30} className="z-20" />
-                {previewImg && (
-                  <img
-                    src={previewImg}
-                    alt={"preview"}
-                    className="w-full absolute top-0 left-0 h-full object-cover opactiy-80 z-10"
-                  />
+                {isCreate ? (
+                  <>
+                    {previewImg && (
+                      <img
+                        src={previewImg}
+                        alt={"preview"}
+                        className="w-full absolute top-0 left-0 h-full object-cover opactiy-80 z-10"
+                      />
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {previewImg ? (
+                      <img
+                        src={previewImg}
+                        className="w-full absolute top-0 left-0 h-full object-cover opactiy-80 z-10"
+                      />
+                    ) : (
+                      <img
+                        src={`${import.meta.env.VITE_API}/${
+                          oldNote.cover_image
+                        }`}
+                        className="w-full absolute top-0 left-0 h-full object-cover opactiy-80 z-10"
+                      />
+                    )}
+                  </>
                 )}
               </div>
               <CustomStyleErrorMessage name="cover_image" />
