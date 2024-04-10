@@ -17,7 +17,8 @@ const NoteForm = ({ isCreate }) => {
   const [redirect, setRedirect] = useState(false);
   const [oldNote, setOldNote] = useState({});
   const [initialValues, setInitivalValues] = useState({});
-  const [previewImg, setPreviewImg] = useState(null);
+  const [previewImg, setPreviewImg] = useState("");
+  const [isUpload, setIsUpload] = useState(false);
   const fileRef = useRef();
 
   const { id } = useParams();
@@ -88,6 +89,8 @@ const NoteForm = ({ isCreate }) => {
   const clearPreviewImg = (setFieldValue) => {
     setPreviewImg(null);
     setFieldValue("cover_image", null);
+
+    fileRef.current.value = "";
   };
 
   // In this method (values) is the form input box
@@ -205,50 +208,68 @@ const NoteForm = ({ isCreate }) => {
                   </p>
                 )}
               </div>
-              <input
-                type="file"
-                name="cover_image"
-                hidden
-                ref={fileRef}
-                onChange={(e) => {
-                  handleImageChange(e, setFieldValue);
-                }}
-              />
-              <div
-                className="border border-teal-600 flex items-center justify-center text-teal-950 border-dashed h-60 cursor-pointer rounded-lg relative overflow-hidden"
-                onClick={() => {
-                  fileRef.current.click();
-                }}
-              >
-                <ArrowUpTrayIcon width={30} height={30} className="z-20" />
-                {isCreate ? (
-                  <>
-                    {previewImg && (
+              {isUpload ? (
+                <>
+                  <p
+                    className="text-base font-medium text-teal-600 cursor-pointer"
+                    onClick={() => setIsUpload(false)}
+                  >
+                    disable cover image
+                  </p>
+                </>
+              ) : (
+                <p
+                  className="text-base font-medium text-teal-600 cursor-pointer"
+                  onClick={() => setIsUpload(true)}
+                >
+                  upload cover image
+                </p>
+              )}
+
+              {isUpload && (
+                <>
+                  <input
+                    type="file"
+                    name="cover_image"
+                    hidden
+                    ref={fileRef}
+                    onChange={(e) => {
+                      handleImageChange(e, setFieldValue);
+                    }}
+                  />
+                  <div
+                    className="border border-teal-600 flex items-center justify-center text-teal-950 border-dashed h-60 cursor-pointer rounded-lg relative overflow-hidden"
+                    onClick={() => {
+                      fileRef.current.click();
+                    }}
+                  >
+                    <ArrowUpTrayIcon width={30} height={30} className="z-20" />
+                    {isCreate ? (
+                      <>
+                        {previewImg && (
+                          <img
+                            src={previewImg}
+                            alt={"preview"}
+                            className="w-full absolute top-0 left-0 h-full object-cover opactiy-80 z-10"
+                          />
+                        )}
+                      </>
+                    ) : (
                       <img
-                        src={previewImg}
+                        src={
+                          previewImg
+                            ? previewImg
+                            : `${import.meta.env.VITE_API}/${
+                                oldNote.cover_image
+                              }`
+                        }
                         alt={"preview"}
                         className="w-full absolute top-0 left-0 h-full object-cover opactiy-80 z-10"
                       />
                     )}
-                  </>
-                ) : (
-                  <>
-                    {previewImg ? (
-                      <img
-                        src={previewImg}
-                        className="w-full absolute top-0 left-0 h-full object-cover opactiy-80 z-10"
-                      />
-                    ) : (
-                      <img
-                        src={`${import.meta.env.VITE_API}/${
-                          oldNote.cover_image
-                        }`}
-                        className="w-full absolute top-0 left-0 h-full object-cover opactiy-80 z-10"
-                      />
-                    )}
-                  </>
-                )}
-              </div>
+                  </div>
+                </>
+              )}
               <CustomStyleErrorMessage name="cover_image" />
             </div>
             <button
