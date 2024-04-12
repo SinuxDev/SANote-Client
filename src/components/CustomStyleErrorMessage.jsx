@@ -1,4 +1,5 @@
 import { ErrorMessage } from "formik";
+import PropTypes from "prop-types";
 
 const CustomStyleErrorMessage = ({ name }) => {
   return (
@@ -6,6 +7,10 @@ const CustomStyleErrorMessage = ({ name }) => {
       <ErrorMessage name={name} />
     </div>
   );
+};
+
+CustomStyleErrorMessage.propTypes = {
+  name: PropTypes.string.isRequired,
 };
 
 export default CustomStyleErrorMessage;
