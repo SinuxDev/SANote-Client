@@ -1,20 +1,59 @@
 import { Formik, Field, Form } from "formik";
+import { useState } from "react";
+import { Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import * as Yup from "yup";
+
+import { ToastContainer, Bounce, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 //formik custom error message
 import CustomStyleErrorMessage from "./CustomStyleErrorMessage";
 
 const AuthForm = ({ isLogin }) => {
+  const [redirect, setRedirect] = useState(false);
   const initialValues = {
     username: "",
     email: "",
     password: "",
   };
 
-  const submitHandler = (values) => {
-    console.log(values);
+  const submitHandler = async (values) => {
+    const { username, password, email } = values;
+    if (isLogin) {
+      //login logic here
+    } else {
+      const response = await fetch(`${import.meta.env.VITE_API}/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password, email }),
+      });
+
+      if (response.status === 201) {
+        setRedirect(true);
+      } else if (response.status === 400) {
+        const data = await response.json();
+        const selectedMessage = data.errorMessages[0].msg;
+        toast.error(selectedMessage, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Bounce,
+        });
+      }
+    }
   };
+
+  if (redirect) {
+    return <Navigate to="/" />;
+  }
 
   const AuthFormSchema = Yup.object({
     username: Yup.string()
@@ -30,63 +69,80 @@ const AuthForm = ({ isLogin }) => {
   });
 
   return (
-    <Formik
-      initialValues={initialValues}
-      onSubmit={submitHandler}
-      validationSchema={AuthFormSchema}
-    >
-      {() => (
-        <Form className="w-1/2 mx-auto mt-6">
-          <h1 className="text-center font-bold text-4xl my-4 text-teal-600 mb-3">
-            {isLogin ? "Login To Your Account" : "Register A New Account"}
-          </h1>
-          <div className="mb-3">
-            <label htmlFor="username" className=" font-medium block">
-              Username
-            </label>
-            <Field
-              type="text"
-              name="username"
-              id="username"
-              className=" text-lg border-2 border-teal-600 py-1 w-full rounded-lg"
-            />
-            <CustomStyleErrorMessage name="username" />
-          </div>
+    <>
+      <Formik
+        initialValues={initialValues}
+        onSubmit={submitHandler}
+        validationSchema={AuthFormSchema}
+      >
+        {() => (
+          <Form className="w-1/2 mx-auto mt-6">
+            <h1 className="text-center font-bold text-4xl my-4 text-teal-600 mb-3">
+              {isLogin ? "Login To Your Account" : "Register A New Account"}
+            </h1>
+            {!isLogin && (
+              <div className="mb-3">
+                <label htmlFor="username" className=" font-medium block">
+                  Username
+                </label>
+                <Field
+                  type="text"
+                  name="username"
+                  id="username"
+                  className=" text-lg border-2 border-teal-600 py-1 w-full rounded-lg"
+                />
+                <CustomStyleErrorMessage name="username" />
+              </div>
+            )}
 
-          <div className="mb-3">
-            <label htmlFor="email" className=" font-medium block">
-              Email
-            </label>
-            <Field
-              type="email"
-              name="email"
-              id="email"
-              className=" text-lg border-2 border-teal-600 py-1 w-full rounded-lg"
-            />
-            <CustomStyleErrorMessage name="email" />
-          </div>
+            <div className="mb-3">
+              <label htmlFor="email" className=" font-medium block">
+                Email
+              </label>
+              <Field
+                type="email"
+                name="email"
+                id="email"
+                className=" text-lg border-2 border-teal-600 py-1 w-full rounded-lg"
+              />
+              <CustomStyleErrorMessage name="email" />
+            </div>
 
-          <div className="mb-3">
-            <label htmlFor="password" className=" font-medium block">
-              Password
-            </label>
-            <Field
-              type="password"
-              name="password"
-              id="password"
-              className=" text-lg border-2 border-teal-600 py-1 w-full rounded-lg"
-            />
-            <CustomStyleErrorMessage name="password" />
-          </div>
-          <button
-            type="submit"
-            className="text-white bg-teal-600 py-3 font-medium w-full"
-          >
-            {isLogin ? "Login" : "Register"}
-          </button>
-        </Form>
-      )}
-    </Formik>
+            <div className="mb-3">
+              <label htmlFor="password" className=" font-medium block">
+                Password
+              </label>
+              <Field
+                type="password"
+                name="password"
+                id="password"
+                className=" text-lg border-2 border-teal-600 py-1 w-full rounded-lg"
+              />
+              <CustomStyleErrorMessage name="password" />
+            </div>
+            <button
+              type="submit"
+              className="text-white bg-teal-600 py-3 font-medium w-full"
+            >
+              {isLogin ? "Login" : "Register"}
+            </button>
+          </Form>
+        )}
+      </Formik>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        transition={Bounce}
+      />
+    </>
   );
 };
 
