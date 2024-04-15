@@ -20,46 +20,56 @@ const AuthForm = ({ isLogin }) => {
 
   const submitHandler = async (values) => {
     const { username, password, email } = values;
-    if (isLogin) {
-      //login logic here
-    } else {
-      const response = await fetch(`${import.meta.env.VITE_API}/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password, email }),
-      });
+    let END_POINT = `${import.meta.env.VITE_API}/register`;
 
-      if (response.status === 201) {
-        setRedirect(true);
-      } else if (response.status === 400) {
-        const data = await response.json();
-        const selectedMessage = data.errorMessages[0].msg;
-        toast.error(selectedMessage, {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Bounce,
-        });
-      }
+    if (isLogin) {
+      END_POINT = `${import.meta.env.VITE_API}/login`;
+    }
+
+    const response = await fetch(END_POINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password, email }),
+    });
+
+    const toastFire = (message) => {
+      toast.error(message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Bounce,
+      });
+    };
+
+    const responseData = await response.json();
+    if (response.status === 201 || response.status === 200) {
+      setRedirect(true);
+    } else if (response.status === 400) {
+      const selectedMessage = responseData.errorMessages[0].msg;
+      toastFire(selectedMessage);
+    } else if (response.status === 401) {
+      toastFire(responseData.message);
     }
   };
 
   if (redirect) {
-    return <Navigate to="/" />;
+    return <Navigate to={isLogin ? "/" : "/login"} />;
   }
 
   const AuthFormSchema = Yup.object({
-    username: Yup.string()
-      .min(3, "Username is too short")
-      .max(10, "Username is too long")
-      .required("Username is required"),
+    username: isLogin
+      ? null
+      : Yup.string()
+          .min(3, "Username is too short")
+          .max(10, "Username is too long")
+          .required("Username is required"),
     email: Yup.string()
       .email("Invalid email format")
       .required("Email is required"),
