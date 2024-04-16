@@ -9,9 +9,11 @@ import * as Yup from "yup";
 
 //formik custom error message
 import CustomStyleErrorMessage from "./CustomStyleErrorMessage";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
+import { UserContext } from "../contexts/UserContext";
 
 const NoteForm = ({ isCreate }) => {
   const [redirect, setRedirect] = useState(false);
@@ -20,6 +22,7 @@ const NoteForm = ({ isCreate }) => {
   const [previewImg, setPreviewImg] = useState("");
   const [isUpload, setIsUpload] = useState(false);
   const fileRef = useRef();
+  const { token } = useContext(UserContext);
 
   const { id } = useParams();
 
@@ -112,6 +115,9 @@ const NoteForm = ({ isCreate }) => {
     const response = await fetch(API, {
       method: "POST",
       body: formData,
+      headers: {
+        Authorization: `Bearer ${token.token}`,
+      },
     });
     if (response.status === 201 || response.status == 200) {
       setRedirect(true);

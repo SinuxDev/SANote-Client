@@ -1,8 +1,10 @@
 import { Formik, Field, Form } from "formik";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import * as Yup from "yup";
+
+import { UserContext } from "../contexts/UserContext";
 
 import { ToastContainer, Bounce, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,6 +14,7 @@ import CustomStyleErrorMessage from "./CustomStyleErrorMessage";
 
 const AuthForm = ({ isLogin }) => {
   const [redirect, setRedirect] = useState(false);
+  const { setToken } = useContext(UserContext);
   const initialValues = {
     username: "",
     email: "",
@@ -49,7 +52,11 @@ const AuthForm = ({ isLogin }) => {
     };
 
     const responseData = await response.json();
-    if (response.status === 201 || response.status === 200) {
+    console.log(responseData);
+    if (response.status === 201) {
+      setRedirect(true);
+    } else if (response.status === 200) {
+      setToken(responseData);
       setRedirect(true);
     } else if (response.status === 400) {
       const selectedMessage = responseData.errorMessages[0].msg;
