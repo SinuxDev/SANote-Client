@@ -87,13 +87,14 @@ const Index = () => {
       ) : (
         <div className="flex justify-center items-center w-full">
           <DNA
-            visible={true}
+            visible={loading}
             height="80"
             width="80"
             ariaLabel="dna-loading"
             wrapperStyle={{}}
             wrapperClass="dna-wrapper"
           />
+          {!loading && notes.length === 0 && <p>No notes found hi </p>}
         </div>
       )}
       <ToastContainer
