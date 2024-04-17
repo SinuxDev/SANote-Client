@@ -7,12 +7,19 @@ import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import formatISO9075 from "date-fns/formatISO9075";
 
+import { useContext } from "react";
+import { UserContext } from "../contexts/UserContext";
+
 const Note = ({ note, getNotesFromAPI, customAlert }) => {
+  const { token } = useContext(UserContext);
   const { _id, title, content, createdAt } = note;
 
   const deleteNote = async () => {
     const response = await fetch(`${import.meta.env.VITE_API}/delete/${_id}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token.token}`,
+      },
     });
     if (response.status === 204) {
       customAlert("Note deleted successfully");
