@@ -99,11 +99,14 @@ const NoteForm = ({ isCreate }) => {
   // In this method (values) is the form input box
   const submitHandler = async (values) => {
     let API = `${import.meta.env.VITE_API}`;
+    let method;
 
     if (isCreate) {
       API = `${import.meta.env.VITE_API}/create`;
+      method = "POST";
     } else {
       API = `${import.meta.env.VITE_API}/edit-note/${values.note_id}`;
+      method = "PUT";
     }
 
     const formData = new FormData();
@@ -113,7 +116,7 @@ const NoteForm = ({ isCreate }) => {
     formData.append("note_id", values.note_id);
 
     const response = await fetch(API, {
-      method: "POST",
+      method,
       body: formData,
       headers: {
         Authorization: `Bearer ${token.token}`,
