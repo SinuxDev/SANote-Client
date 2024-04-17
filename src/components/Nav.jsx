@@ -3,8 +3,31 @@ import { useContext } from "react";
 
 import { UserContext } from "../contexts/UserContext";
 
+import { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
+
 const Nav = () => {
   const { token } = useContext(UserContext);
+  const [redirect, setRedirect] = useState(false);
+
+  const isLogin = async () => {
+    const response = await fetch(`${import.meta.env.VITE_API}/status`, {
+      headers: {
+        Authorization: `Bearer ${token.token}`,
+      },
+    });
+    if (response.status === 401) {
+      setRedirect(true);
+    }
+  };
+
+  useEffect(() => {
+    isLogin();
+  });
+
+  if (redirect) {
+    return <Navigate to="/login" />;
+  }
 
   return (
     <nav className=" bg-slate-200 py-4 px-10 flex items-center justify-between font-mono">
