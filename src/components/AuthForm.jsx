@@ -14,7 +14,7 @@ import CustomStyleErrorMessage from "./CustomStyleErrorMessage";
 
 const AuthForm = ({ isLogin }) => {
   const [redirect, setRedirect] = useState(false);
-  const { setToken } = useContext(UserContext);
+  const { updateToken } = useContext(UserContext);
   const initialValues = {
     username: "",
     email: "",
@@ -56,7 +56,7 @@ const AuthForm = ({ isLogin }) => {
     if (response.status === 201) {
       setRedirect(true);
     } else if (response.status === 200) {
-      setToken(responseData);
+      updateToken(responseData);
       setRedirect(true);
     } else if (response.status === 400) {
       const selectedMessage = responseData.errorMessages[0].msg;
