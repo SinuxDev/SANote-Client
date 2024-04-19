@@ -27,14 +27,18 @@ const NoteForm = ({ isCreate }) => {
   const { id } = useParams();
 
   const getOldNote = useCallback(async () => {
-    const response = await fetch(`${import.meta.env.VITE_API}/edit/${id}`);
+    const response = await fetch(`${import.meta.env.VITE_API}/edit/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token.token}`,
+      },
+    });
     if (response.status === 200) {
       const data = await response.json();
       setOldNote(data);
     } else {
       setRedirect(true);
     }
-  }, [id]);
+  }, [id, token.token]);
 
   useEffect(() => {
     if (!isCreate) {
