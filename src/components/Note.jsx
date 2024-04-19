@@ -24,6 +24,8 @@ const Note = ({ note, getNotesFromAPI, customAlert }) => {
     if (response.status === 204) {
       customAlert("Note deleted successfully");
       getNotesFromAPI();
+    } else {
+      customAlert("You are not authorized to delete this note.", true);
     }
   };
 
@@ -36,14 +38,22 @@ const Note = ({ note, getNotesFromAPI, customAlert }) => {
           {formatISO9075(new Date(createdAt), { representation: "date" })}{" "}
         </p>
         <div className="flex items-center justify-end gap-2">
-          <TrashIcon
-            width={17}
-            className="text-red-600 cursor-pointer"
-            onClick={deleteNote}
-          />
-          <Link to={"/edit/" + _id}>
-            <PencilSquareIcon width={17} className="text-teal-600" />
-          </Link>
+          {token && (
+            <>
+              {note.author.toString() === token.userId.toString() && (
+                <>
+                  <TrashIcon
+                    width={17}
+                    className="text-red-600 cursor-pointer"
+                    onClick={deleteNote}
+                  />
+                  <Link to={"/edit/" + _id}>
+                    <PencilSquareIcon width={17} className="text-teal-600" />
+                  </Link>
+                </>
+              )}
+            </>
+          )}
           <Link to={"notes/" + _id}>
             <EyeIcon width={17} className="text-gray-500" />
           </Link>
