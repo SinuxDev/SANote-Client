@@ -29,6 +29,28 @@ const Note = ({ note, getNotesFromAPI, customAlert }) => {
     }
   };
 
+  const handleDeleteNote = async () => {
+    const localToken = JSON.parse(localStorage.getItem("token"));
+
+    if (!localToken) {
+      localStorage.setItem("token", null);
+      window.location.reload(false);
+    }
+
+    const response = await fetch(`${import.meta.env.VITE_API}/status`, {
+      headers: {
+        Authorization: `Bearer ${localToken.token}`,
+      },
+    });
+
+    if (response.status === 401) {
+      localStorage.setItem("token", null);
+      window.location.reload(false);
+    } else {
+      deleteNote();
+    }
+  };
+
   return (
     <div className=" w-2/5 border-t-4 border-t-teal-600 shadow-lg p-3 h-f">
       <h3 className="text-xl font-medium">{title}</h3>
@@ -45,7 +67,7 @@ const Note = ({ note, getNotesFromAPI, customAlert }) => {
                   <TrashIcon
                     width={17}
                     className="text-red-600 cursor-pointer"
-                    onClick={deleteNote}
+                    onClick={handleDeleteNote}
                   />
                   <Link to={"/edit/" + _id}>
                     <PencilSquareIcon width={17} className="text-teal-600" />
